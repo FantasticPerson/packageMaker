@@ -19,13 +19,34 @@ function createWindow() {
         mainWindow = null;
     });
 
-    var ret = globalShortcut.register('f5', function () {
-        var win = BrowserWindow.getFocusedWindow();
-        if (win) {
-            var contents = win.webContents;
-            contents.reloadIgnoringCache();
-        }
+    function registerShotCut(){
+        var ret = globalShortcut.register('f5', function () {
+            var win = BrowserWindow.getFocusedWindow();
+            if (win) {
+                var contents = win.webContents;
+                contents.reload();
+            }
+        });
+        var ret2 = globalShortcut.register('ctrl+r', function () {
+            var win = BrowserWindow.getFocusedWindow();
+            if (win) {
+                var contents = win.webContents;
+                contents.reloadIgnoringCache();
+            }
+        });
+    }
+
+    mainWindow.on('blur', function() {
+        let win = BrowserWindow.getFocusedWindow();
+        if(win) return;
+        globalShortcut.unregisterAll();
     });
+
+    mainWindow.on('focus', function() {
+        registerShotCut();
+    });
+
+    registerShotCut();
 }
 
 app.commandLine.appendSwitch('ppapi-flash-path', __dirname + '/pepflashplayer.dll');

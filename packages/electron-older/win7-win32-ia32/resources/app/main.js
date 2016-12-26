@@ -40,13 +40,36 @@ app.on('ready', function() {
     mainWindow = null;
   });
 
-  var ret = globalShortcut.register('f5',function(){
-    var win = BrowserWindow.getFocusedWindow();
-    if(win){
-      win.reload();
-    }
+  function registerShotCut(){
+    var ret = globalShortcut.register('f5', function () {
+      var win = BrowserWindow.getFocusedWindow();
+      if (win) {
+        var contents = win.webContents;
+        contents.reload();
+      }
+    });
+    var ret2 = globalShortcut.register('ctrl+r', function () {
+      var win = BrowserWindow.getFocusedWindow();
+      if (win) {
+        var contents = win.webContents;
+        contents.reloadIgnoringCache();
+      }
+    });
+  }
+
+    mainWindow.on('blur', function() {
+        setTimeout(function () {
+            var win = BrowserWindow.getFocusedWindow();
+            if(win) return;
+            globalShortcut.unregisterAll();
+        },20)
+    });
+
+  mainWindow.on('focus', function() {
+    registerShotCut();
   });
 
+  registerShotCut();
 });
 
 app.commandLine.appendSwitch('--enable-npapi');

@@ -61,15 +61,36 @@ exports.winOld = function generateJson(needRefreshKey=false,needFlash=false,need
     returnJson += "\t\tmainWindow = null;\r\n";
     returnJson += "\t});\r\n";
 
-    if(needRefreshKey) {
-        returnJson += "\tglobalShortcut.register('f5',function(){\r\n";
-        returnJson += "\t\tvar win = BrowserWindow.getFocusedWindow();\r\n";
-        returnJson += "\t\tif(win){\r\n";
-        returnJson += "\t\t\twin.reload();\r\n";
-        returnJson += "\t\t}\r\n";
-        returnJson += "\t});\r\n";
-        returnJson += "});\r\n";
-    }
+    returnJson += "\tfunction registerShotCut(){\r\n";
+    returnJson += "\t\tvar ret = globalShortcut.register('f5', function () {\r\n";
+    returnJson += "\t\t\tvar win = BrowserWindow.getFocusedWindow();\r\n";
+    returnJson += "\t\t\tif (win) {\r\n";
+    returnJson += "\t\t\t\tvar contents = win.webContents;\r\n";
+    returnJson += "\t\t\t\tcontents.reload();\r\n";
+    returnJson += "\t\t\t}\r\n";
+    returnJson += "\t\t});\r\n";
+    returnJson += "\t\tvar ret2 = globalShortcut.register('ctrl+r', function () {\r\n";
+    returnJson += "\t\t\tvar win = BrowserWindow.getFocusedWindow();\r\n";
+    returnJson += "\t\t\tif (win) {\r\n";
+    returnJson += "\t\t\t\tvar contents = win.webContents;\r\n";
+    returnJson += "\t\t\t\tcontents.reloadIgnoringCache();\r\n";
+    returnJson += "\t\t\t}\r\n";
+    returnJson += "\t\t});\r\n";
+    returnJson += "\t}\r\n";
+
+    returnJson += "\tmainWindow.on('blur', function() {\r\n";
+    returnJson += "\t\tsetTimeout(function () {\r\n";
+    returnJson += "\t\t\tvar win = BrowserWindow.getFocusedWindow();\r\n";
+    returnJson += "\t\t\tif(win) return;\r\n";
+    returnJson += "\t\t\tglobalShortcut.unregisterAll();\r\n";
+    returnJson += "\t\t},20)\r\n";
+    returnJson += "\t});\r\n";
+    returnJson += "\tmainWindow.on('focus', function() {\r\n";
+    returnJson += "\t\tregisterShotCut();\r\n";
+    returnJson += "\t});\r\n";
+    returnJson += "\tregisterShotCut();\r\n";
+    returnJson += "})\r\n";
+
     returnJson += "app.commandLine.appendSwitch('--enable-npapi');\r\n";
 
     return returnJson;

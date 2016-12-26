@@ -8,9 +8,8 @@ exports.winNew =  function getMainJson(needRefreshKey=false,needFlash=false,need
     returnJson += " */\r\n";
 
     returnJson += "const electron = require('electron');\r\n";
-    if(needRefreshKey) {
-        returnJson += "const {globalShortcut} = require('electron');\r\n";
-    }
+    returnJson += "const {globalShortcut} = require('electron');\r\n";
+
     returnJson += "const app = electron.app;\r\n";
     returnJson += "const BrowserWindow = electron.BrowserWindow;\r\n";
     returnJson += "let mainWindow;\r\n";
@@ -29,16 +28,34 @@ exports.winNew =  function getMainJson(needRefreshKey=false,needFlash=false,need
     returnJson += "\t\tmainWindow = null;\r\n";
     returnJson += "\t});\r\n";
 
-    if(needRefreshKey) {
-        returnJson += "\tglobalShortcut.register('f5', function () {\r\n";
-        returnJson += "\t\tvar win = BrowserWindow.getFocusedWindow();\r\n";
-        returnJson += "\t\tif (win) {\r\n";
-        returnJson += "\t\t\tvar contents = win.webContents;\r\n";
-        returnJson += "\t\t\tcontents.reloadIgnoringCache();\r\n";
-        returnJson += "\t\t}\r\n";
-        returnJson += "\t});\r\n";
-    }
+    returnJson += "\tfunction registerShotCut(){\r\n";
+    returnJson += "\t\tvar ret = globalShortcut.register('f5', function () {\r\n";
+    returnJson += "\t\t\tvar win = BrowserWindow.getFocusedWindow();\r\n";
+    returnJson += "\t\t\tif (win) {\r\n";
+    returnJson += "\t\t\t\tvar contents = win.webContents;\r\n";
+    returnJson += "\t\t\t\tcontents.reload();\r\n";
+    returnJson += "\t\t\t}\r\n";
+    returnJson += "\t\t});\r\n";
+    returnJson += "\t\tvar ret2 = globalShortcut.register('ctrl+r', function () {\r\n";
+    returnJson += "\t\t\tvar win = BrowserWindow.getFocusedWindow();\r\n";
+    returnJson += "\t\t\tif (win) {\r\n";
+    returnJson += "\t\t\t\tvar contents = win.webContents;\r\n";
+    returnJson += "\t\t\t\tcontents.reloadIgnoringCache();\r\n";
+    returnJson += "\t\t\t}\r\n";
+    returnJson += "\t\t});\r\n";
+    returnJson += "\t}\r\n";
+
+    returnJson += "\tmainWindow.on('blur', function() {\r\n";
+    returnJson += "\t\tlet win = BrowserWindow.getFocusedWindow();\r\n";
+    returnJson += "\t\tif(win) return;\r\n";
+    returnJson += "\t\tglobalShortcut.unregisterAll();\r\n";
+    returnJson += "\t});\r\n";
+    returnJson += "\tmainWindow.on('focus', function() {\r\n";
+    returnJson += "\t\tregisterShotCut();\r\n";
+    returnJson += "\t});\r\n";
+    returnJson += "\tregisterShotCut();\r\n";
     returnJson += "}\r\n";
+
 
     if(needFlash) {
         returnJson += "app.commandLine.appendSwitch('ppapi-flash-path', __dirname + '/pepflashplayer.dll');\r\n";
