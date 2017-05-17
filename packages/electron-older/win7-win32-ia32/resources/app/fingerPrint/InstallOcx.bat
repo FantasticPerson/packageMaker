@@ -1,1 +1,0 @@
-regsvr32 FignerPrints_ActiveX.ocx
